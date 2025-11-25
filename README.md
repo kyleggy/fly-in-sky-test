@@ -15,6 +15,8 @@ This project contains automated E2E tests for testing Kong API Gateway functiona
 - **Node.js**: v14 or higher
 - **npm**: v6 or higher (comes with Node.js)
 - **Kong API Gateway**: Running instance accessible at the configured endpoints
+  - Use Docker Compose (recommended for local development) - see [Docker Setup](#docker-setup-optional) section
+
 
 ## Installation
 
@@ -30,6 +32,42 @@ This project contains automated E2E tests for testing Kong API Gateway functiona
    ```
 
    This will install Cypress and all required dependencies based on `package-lock.json`.
+
+## Docker Setup (Optional)
+
+For local development and testing, you can use Docker Compose to run Kong API Gateway:
+
+1. **Start Kong Gateway with Docker Compose**
+   ```bash
+   cd docker
+   docker-compose up -d
+   ```
+
+2. **Verify Kong Gateway is running**
+   ```bash
+   # Check container status
+   docker-compose ps
+   
+   # Check Kong Gateway health
+   curl http://localhost:8001/
+   ```
+
+3. **Access Kong Gateway**
+   - **Admin API**: http://localhost:8001
+   - **Admin GUI**: http://localhost:8002
+   - **Proxy**: http://localhost:8000
+
+4. **Stop Kong Gateway**
+   ```bash
+   docker-compose down
+   ```
+
+The Docker setup includes:
+- **PostgreSQL**: Database for Kong (port 5432)
+- **Kong Control Plane**: Kong API Gateway with Admin API (port 8001) and Admin GUI (port 8002)
+- **Kong Proxy**: Gateway proxy (port 8000)
+
+**Note**: The default Kong admin password is `handyshake` (configured in docker-compose.yml).
 
 ## Configuration
 
@@ -129,6 +167,8 @@ fly-in-sky-test/
 │           ├── route_main_page.js
 │           ├── service_detail_display_page.js
 │           └── workspace_page.js
+├── docker/                           # Docker configuration
+│   └── docker-compose.yml           # Kong Gateway Docker setup
 ├── cypress.config.js                # Cypress configuration
 ├── jsconfig.json                    # JavaScript configuration
 ├── package.json                     # Node.js dependencies
