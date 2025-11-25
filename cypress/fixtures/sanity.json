@@ -1,0 +1,13 @@
+{
+  "service": {
+    "name": "Bing",
+    "url": "https://www.bing.com"
+  },
+  "route": {
+    "name": "TestBing",
+    "path": "/api/v1",
+    "method": "GET",
+    "service": "Bing",
+    "tags": "bing tag01"
+  }
+}

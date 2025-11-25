@@ -1,0 +1,14 @@
+{
+    "serviceFullURL": {
+        "name": "TestBing",
+        "url": "https://www.bing.com"
+    },
+    "serviceManual": {
+        "name": "TestGetFlights",
+        "protocol": "https",
+        "enabled": "true",
+        "host": "api.kong-air.com",
+        "path": "/flights",
+        "port": "444"
+    }
+}
