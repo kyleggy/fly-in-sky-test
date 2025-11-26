@@ -139,6 +139,18 @@ npx cypress run --record
 npx cypress run --no-record
 ```
 
+## Test Reports
+
+This project uses **Cypress Mochawesome Reporter** to generate HTML test reports with embedded screenshots and charts.
+
+Reports are automatically generated when running tests. After execution, open the HTML report:
+
+```bash
+open cypress/reports/kong-api-gateway-test-report_*.html
+```
+
+Reports are saved to `cypress/reports/` with timestamp format: `yyyy-mm-dd_HH-MM-ss`. Videos are only recorded when tests fail.
+
 ## Project Structure
 
 ```
