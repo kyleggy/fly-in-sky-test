@@ -16,7 +16,6 @@ module.exports = defineConfig({
       reportDir: 'cypress/reports',
       overwrite: false,
       html: true,
-      json: true,
       inlineAssets: true,
       charts: true,
       reportPageTitle: 'Kong API Gateway Test Report',
