@@ -9,7 +9,7 @@ export class GatewayServiceMainPage {
         this.applyNameButton = 'div[data-testid="name"] button[data-testid="apply-filter"]'
         this.filterProtocol = 'div[data-testid="protocol"]'
         this.filterProtocolDropdown = 'div[data-testid="protocol"] input[data-testid="select-input"]'
-        this.filterProtocolDropdownPrefix = 'div[data-testid="protocol"] div[data-testid="select-item-"'
+        this.filterProtocolDropdownPrefix = 'div[data-testid="protocol"] div[data-testid="select-item-'
         this.filterProtocolApplyButton = 'div[data-testid="protocol"] button[data-testid="apply-filter"]'
         this.deleteMenuButton = 'button[data-testid="action-entity-delete"]'
         this.enabledSwitch = 'span[data-testid="switch-control"]'
@@ -18,6 +18,10 @@ export class GatewayServiceMainPage {
         this.orderByNameColumnHeader = 'th[data-testid="table-header-name"]'
         this.gridRow = 'tbody tr[data-testid]:not([data-testid=""])'
         this.emptyServiceState = 'div[data-testid="table-empty-state"]'
+        this.nameCell = 'td[data-testid="name"]'
+        this.protocolCell = 'td[data-testid="protocol"]'
+        this.alertMessageForDeleteServiceBindWithRoute = 'div[class="prompt-content"] div[class="alert-message"]'
+        this.disableServicePopupButton = 'button[data-testid="modal-action-button"]'
     }
 
     _getTriggerButton(serviceName) {
@@ -44,11 +48,39 @@ export class GatewayServiceMainPage {
         cy.get(this.deleteConfirmationInput).type(serviceName)
     }
 
+    _getSwitchToggle(serviceName) {
+        return `tr[data-testid="${serviceName}"] span[data-testid="switch-control"]`
+    }
+
+    //`tr[data-testid="${serviceName}"] input[type="checkbox"][data-testid*="toggle-input"]`
+    _getToggleCheckbox(serviceName) {
+        return `tr[data-testid="${serviceName}"] span[data-testid="switch-control"]`
+    }
+
+    _clickDisableToggle(serviceName) {
+        cy.get(this._getToggleCheckbox(serviceName)).click({ force: true })
+        cy.get(this.disableServicePopupButton).click()
+    }
+
+    verifyToggleUncheckedAfterDisableService(serviceName) {
+        cy.get(this._getToggleCheckbox(serviceName)).should('have.class', 'checked')
+        this._clickDisableToggle(serviceName)
+        cy.get(this._getToggleCheckbox(serviceName)).should('not.have.class', 'checked')
+    }
+
     deleteService(serviceName) {
         this._clickTriggerButton(serviceName)
         this._clickDeleteMenuButton(serviceName)
         this._typeDeleteConfirmation(serviceName)
         this._clickDeleteConfirmationApplyButton()
+    }
+
+    verifyServiceBindWithRouteNotAllowedDelete(serviceName) {
+        this._clickTriggerButton(serviceName)
+        this._clickDeleteMenuButton(serviceName)
+        this._typeDeleteConfirmation(serviceName)
+        this._clickDeleteConfirmationApplyButton()
+        cy.get(this.alertMessageForDeleteServiceBindWithRoute).should('have.text', 'an existing \'routes\' entity references this \'services\' entity')
     }
 
     orderByByName() {   
@@ -79,10 +111,6 @@ export class GatewayServiceMainPage {
         })
     }
 
-    selectServiceByName(serviceName) {
-        cy.get(`tr[data-testid="${serviceName}"]`).select()
-    }
-
     getEnabledSwitch(serviceName) {
         return `tr[data-testid="${serviceName}"] span[data-testid="switch-control"]`
     }
@@ -106,6 +134,15 @@ export class GatewayServiceMainPage {
         })
     }
 
+    setFilterByNameAndProtocol(name, protocol) {
+        cy.get(this.filterName).click()
+        cy.get(this.filterNameInput).type(name)
+        cy.get(this.filterProtocol).click()
+        cy.get(this.filterProtocolDropdown).click()
+        cy.get(this.filterProtocolDropdownPrefix + protocol + '"]').click()
+        cy.get(this.filterProtocolApplyButton).click()
+    }
+
     setFilterByName(name) { 
         cy.get(this.filterName).click()
         cy.get(this.filterNameInput).type(name)
@@ -120,17 +157,40 @@ export class GatewayServiceMainPage {
         cy.get(this.gridRow).should('have.length', expectedCount)
     }
 
-    getRowCountInGrid() {
-        return cy.get(this.gridRow).its('length')
-    }
-
     verifyRowNameInGrid(serviceName) {
         cy.get(`tr[data-testid="${serviceName}"]`).should('exist')
+    }
+
+    verifyRowCountAndNameStartsWithInGrid(prefix, expectedCount) {
+        this.verifyRowCountStartsWithInGrid(prefix, expectedCount)
+        cy.get(`tbody tr[data-testid^="${prefix}"]`).each(($row) => {
+            // Find the name cell (td[data-testid="name"]) within this specific row and wrap it
+            cy.wrap($row.find(this.nameCell)).within(() => {
+                // Verify the <b> element exists and its text starts with the prefix
+                cy.get('b').should('exist').and(($b) => {
+                    expect($b.text().startsWith(prefix)).to.be.true
+                })
+            })
+        })
+    }
+
+    verifyRowCountAndProtocolInGrid(prefix, protocol, expectedCount) {
+        this.verifyRowCountStartsWithInGrid(prefix, expectedCount)
+        cy.get(`tbody tr[data-testid^="${prefix}"]`).each(($row) => {
+            // Find the protocol cell (td[data-testid="protocol"]) within this specific row and wrap it
+            cy.wrap($row.find(this.protocolCell)).within(() => {
+                // Get the span with class "content-wrapper" that equals to the protocol value
+                cy.get('span.content-wrapper').should('exist').and(($span) => {
+                    expect($span.text().trim()).to.equal(protocol)
+                })
+            })
+        })
     }
 
     verifyRowCountStartsWithInGrid(prefix, expectedCount) {
         cy.get(`tbody tr[data-testid^="${prefix}"]`).should('have.length', expectedCount)
     }
+
 }
 
 export const gatewayServiceMainPage = new GatewayServiceMainPage()

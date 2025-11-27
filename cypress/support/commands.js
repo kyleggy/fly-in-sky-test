@@ -9,24 +9,99 @@
 // ***********************************************
 
 /**
+ * Create a route via POST request
+ * @param {object} routeData - The route data to create
+ * @returns {Cypress.Chainable} The response object
+ */
+Cypress.Commands.add('createRoute', (routeData) => {
+    cy.log(`Creating route: ${routeData.name || 'unnamed route'}`)
+    return cy.fixture('server.json').then((server) => {
+        const routesAPIURL = `${server.protocol}://${server.host}:${server.adminPort}/${server.workspace}/routes`
+        return cy.request({
+            method: 'POST',
+            url: routesAPIURL,
+            body: routeData,
+            failOnStatusCode: false
+        }).then((response) => {
+            // Verify status without changing the chain
+            if (response.status !== 201) {
+                throw new Error(`Expected status 201 but got ${response.status}. Response: ${JSON.stringify(response.body)}`)
+            }
+            cy.log(`Successfully created route: ${routeData.name || 'unnamed route'}`)
+            // Return the response wrapped in a chainable object to sync/async conflicts error
+            return cy.wrap(response)
+        })
+    })
+})
+
+/**
  * Delete a single route by ID
  * @param {string} routeId - The route ID to delete
+ * @returns {Cypress.Chainable} The response object with success status
  */
 Cypress.Commands.add('deleteRoute', (routeId) => {
     cy.log(`Destroying route ID: ${routeId}`)
-    cy.fixture('server.json').then((server) => {
+    return cy.fixture('server.json').then((server) => {
         const routesAPIURL = `${server.protocol}://${server.host}:${server.adminPort}/${server.workspace}/routes/${routeId}`
-        cy.request({
+        return cy.request({
             method: 'DELETE',
             url: routesAPIURL,
             failOnStatusCode: false
         }).then((response) => {
             if (response.status === 204) {
                 cy.log(`Successfully deleted route ID: ${routeId}`)
+                return cy.wrap({ success: true, status: response.status })
             } else if (response.status === 404) {
                 cy.log(`Route ID ${routeId} not found (already deleted or doesn't exist)`)
+                return cy.wrap({ success: false, status: response.status })
             } else {
                 cy.log(`Unexpected status ${response.status} when deleting route ID: ${routeId}`)
+                return cy.wrap({ success: false, status: response.status })
+            }
+        })
+    })
+})
+
+/**
+ * Delete a route first, then delete the associated service if route deletion succeeds
+ * @param {string} routeId - The route ID to delete
+ * @param {string} serviceId - The service ID to delete after route is deleted
+ * @example cy.deleteRouteAndService('route-id', 'service-id')
+ */
+Cypress.Commands.add('deleteRouteAndService', (routeId, serviceId) => {
+    cy.log(`Deleting route ${routeId} and then service ${serviceId}`)
+    cy.deleteRoute(routeId).then((result) => {
+        if (result.success) {
+            cy.log(`Route deleted successfully, now deleting service ${serviceId}`)
+            cy.deleteService(serviceId)
+        } else {
+            cy.log(`Route deletion failed (status: ${result.status}), skipping service deletion`)
+        }
+    })
+})
+
+/**
+ * Get route details and delete route first, then delete the associated service if route deletion succeeds
+ * Automatically retrieves the service ID from the route
+ * @param {string} routeId - The route ID to delete
+ * @example cy.deleteRouteAndBindingService('route-id')
+ */
+Cypress.Commands.add('deleteRouteAndBindingService', (routeId) => {
+    cy.log(`Getting route ${routeId} details to find associated service`)
+    cy.fixture('server.json').then((server) => {
+        const routesAPIURL = `${server.protocol}://${server.host}:${server.adminPort}/${server.workspace}/routes/${routeId}`
+        cy.request({
+            method: 'GET',
+            url: routesAPIURL,
+            failOnStatusCode: false
+        }).then((response) => {
+            if (response.status === 200 && response.body.service && response.body.service.id) {
+                const serviceId = response.body.service.id
+                cy.log(`Found service ID ${serviceId} associated with route ${routeId}`)
+                cy.deleteRouteAndService(routeId, serviceId)
+            } else {
+                cy.log(`Route ${routeId} not found or has no associated service. Attempting to delete route only.`)
+                cy.deleteRoute(routeId)
             }
         })
     })

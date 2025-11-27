@@ -91,6 +91,9 @@ describe('basic flow', function() {
                 }).then((response) => {
                     if (response.status === 200) {
                         expect(response.status).to.eq(200)
+                        // Verify response contains expected Bing content
+                        const responseText = response.body.toString().toLowerCase()
+                        expect(responseText).to.include('bing')
                     } else if (Date.now() - startTime < timeout) {
                         cy.wait(1000, { log: false }) // Wait 1 second before retrying
                         retryRequest()
