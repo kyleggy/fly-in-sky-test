@@ -11,8 +11,8 @@ module.exports = defineConfig({
     },
     specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
     // Enable videos for all test runs in CI, fail-only for local runs
-    video: true, // Always record videos
-    videoOnFailOnly: !process.env.CI && process.env.CYPRESS_VIDEO !== 'true', // Only keep videos on failures locally, keep all in CI
+    video: process.env.CI === 'true' || process.env.CYPRESS_VIDEO === 'true', // Only record videos in CI or when explicitly enabled
+    videoOnFailOnly: false, // Keep all videos when recorded
     reporter: 'cypress-mochawesome-reporter',
     reporterOptions: {
       reportDir: 'cypress/reports',
