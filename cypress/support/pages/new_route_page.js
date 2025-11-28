@@ -138,10 +138,25 @@ export class NewRoutePage {
         // Handle array of paths - set each path with its index
         const paths = Array.isArray(routePath) ? routePath : [routePath]
         cy.wrap(paths).each((path, index) => {
+            const pathInputSelector = this.routePathInputPrefix + (index + 1) + '"]'
+            
             if (index === 0) {
+                // Wait for the first path input to be visible and enabled before setting
+                cy.get(pathInputSelector).should('be.visible').should('not.be.disabled')
                 this.setPathAdvanced(index + 1, path)
             } else {
-                cy.get(this.addPathButton).click()
+                // Wait for add button to be visible and clickable before clicking
+                cy.get(this.addPathButton)
+                    .should('be.visible')
+                    .should('not.be.disabled')
+                    .click()
+                
+                // Wait for the new path input field to appear and be ready
+                cy.get(pathInputSelector, { timeout: 10000 })
+                    .should('be.visible')
+                    .should('exist')
+                    .should('not.be.disabled')
+                
                 this.setPathAdvanced(index + 1, path)
             }
         })
