@@ -385,6 +385,8 @@ Tests use prefixed names to avoid conflicts:
 
 4. **Shell script compatibility**: The provided shell scripts (`run-tests.sh` and `run-tests.ps1`) may fail to run in some environments due to different shell configurations or permissions. If shell commands fail, please execute `npx cypress run` manually to run the tests.
 
+5. **Test type limitation**: This test suite only includes end-to-end (e2e) tests. Component tests are not included in this project.
+
 ## Troubleshooting
 
 ### Tests fail to connect to Kong Gateway
