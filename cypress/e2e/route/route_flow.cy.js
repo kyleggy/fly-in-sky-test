@@ -70,6 +70,16 @@ describe('Route Flow', function() {
                     } else {
                         throw new Error(`Route ${routeIndex + 1} (${route.name}) did not return 200 within ${timeout}ms. Last status: ${response.status}`)
                     }
+                }).catch((error) => {
+                    // Handle network errors, timeouts, or no response
+                    const elapsedTime = Date.now() - startTime
+                    if (elapsedTime < timeout) {
+                        cy.log(`Route ${routeIndex + 1} (${route.name}) request failed, retrying... Error: ${error.message || error}`)
+                        cy.wait(1000, { log: true }) // Wait 1 second before retrying
+                        retryRequest()
+                    } else {
+                        throw new Error(`Route ${routeIndex + 1} (${route.name}) failed after ${timeout}ms. Error: ${error.message || error}`)
+                    }
                 })
             }
             retryRequest()
