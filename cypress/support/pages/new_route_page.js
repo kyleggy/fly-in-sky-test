@@ -149,8 +149,10 @@ export class NewRoutePage {
                 cy.get(this.addPathButton)
                     .should('be.visible')
                     .click()
+                cy.wait(1000) // Wait 1 second for the new input field to appear
                 cy.get(pathInputSelector).scrollIntoView().should('be.visible')
                 this.setPathAdvanced(index + 1, path)
+                cy.wait(1000) // Wait 1 second for the new input field to be set
             }
         })
         this.selectMethod(routeMethod)
