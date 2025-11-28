@@ -165,7 +165,9 @@ describe('Route Flow', function() {
 
     it('should verify both paths in one route work correctly', function() {
         // Skip this test when running in CI
-        if (process.env.CI) {
+        // Check Cypress environment variable set from process.env.CI
+        if (Cypress.env('CI')) {
+            cy.log('Skipping test in CI environment')
             this.skip()
             return
         }

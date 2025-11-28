@@ -5,6 +5,9 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       // implement node event listeners here
       require('cypress-mochawesome-reporter/plugin')(on);
+      // Pass CI environment variable to Cypress
+      config.env.CI = process.env.CI || false
+      return config
     },
     specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
     // Enable videos for all test runs in CI, fail-only for local runs
