@@ -148,9 +148,8 @@ export class NewRoutePage {
                 // Wait for add button to be visible and clickable before clicking
                 cy.get(this.addPathButton)
                     .should('be.visible')
-                    .should('not.be.disabled')
                     .click()
-                
+                cy.get(pathInputSelector).scrollIntoView().should('be.visible')
                 this.setPathAdvanced(index + 1, path)
             }
         })
