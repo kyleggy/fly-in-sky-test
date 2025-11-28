@@ -107,9 +107,15 @@ describe('Route Flow', function() {
                 routeData.path,
                 routeData.method
             )
-            routeDetailDisplayPage.getRouteId().then((routeId) => {
+            // Return the chainable so it can be used with .then()
+            let storedRouteId
+            return routeDetailDisplayPage.getRouteId().then((routeId) => {
+                storedRouteId = routeId
                 routeIDs.push(routeId)
                 cy.log(`Stored route ID: ${routeId}`)
+            }).then(() => {
+                // Wrap the routeId in cy.wrap() after cy.log() completes
+                return cy.wrap(storedRouteId)
             })
         }
     })
@@ -132,11 +138,17 @@ describe('Route Flow', function() {
     })
 
     it('should create first route bound to service successfully', function() {
-        this.createRoute(route.routes[0])
+        this.createRoute(route.routes[0]).then((routeIDs) => {
+            cy.log(`Route IDs: ${routeIDs}`)
+            routeDetailDisplayPage.verifyRouteDetails(route.routes[0])
+        })
     })
 
     it('should create second route bound to service successfully', function() {
-        this.createRoute(route.routes[1])
+        this.createRoute(route.routes[1]).then((routeIDs) => {
+            cy.log(`Route IDs: ${routeIDs}`)
+            routeDetailDisplayPage.verifyRouteDetails(route.routes[1])
+        })
     })
 
     it('should verify both routes work correctly via REST calls', function() {
@@ -159,18 +171,22 @@ describe('Route Flow', function() {
         routeDetailDisplayPage.getRouteId().then((routeId) => {
             routeIDs.push(routeId)
             cy.log(`Stored route ID: ${routeId}`)
+        }).then((routeIDs) => {
+            cy.log(`Route IDs: ${routeIDs}`)
+            routeDetailDisplayPage.verifyRouteDetails(route.routes[2])
+           
         })
-      
+       
     })
 
     it('should verify both paths in one route work correctly', function() {
         // Skip this test when running in CI
         // Check Cypress environment variable set from process.env.CI
-        if (Cypress.env('CI')) {
-            cy.log('Skipping test in CI environment')
-            this.skip()
-            return
-        }
+        // if (Cypress.env('CI')) {
+        //     cy.log('Skipping test in CI environment')
+        //     this.skip()
+        //     return
+        // }
         
         cy.fixture('server.json').then((server) => {
             this.verifyRoute(route.routes[2], route.routes[2].path[0], 2, server)

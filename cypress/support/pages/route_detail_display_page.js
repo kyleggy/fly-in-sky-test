@@ -1,6 +1,6 @@
 export class RouteDetailDisplayPage {
     constructor() {
-        this.routeId = 'div[data-testid="id-copy-uuid"]'
+        this.routeId = 'input[data-testid="route-id-input"]'
         this.routeConfigCard = 'div[data-testid="config-card-details-basic-props"]'
         this.nameProperty = 'div[data-testid="name-plain-text"]'
         this.serviceProperty = 'div[data-testid="service-property-value"]'
@@ -13,8 +13,7 @@ export class RouteDetailDisplayPage {
     }
 
     getRouteId() {
-        // Get the UUID text from the nested copy-text element within id-property-value
-        return cy.get(this.routeId, { timeout: 10000 }).find('.copy-text.monospace').invoke('text')
+        return cy.get(this.routeId)
     }
 
     getNameProperty() {
@@ -37,9 +36,9 @@ export class RouteDetailDisplayPage {
         this.getNameProperty().getText().should('eq', routeName)
     }
 
-    // verifyRouteDetails(route) {
-    //     this.getRouteId().should('eq', route.id)
-    // }
+    verifyRouteDetails(route) {
+        this.getRouteId().should('eq', route.id)
+    }
 
     verifyServicePropertyValue(serviceName) {
         this.getServiceProperty().getText().should('eq', serviceName)
@@ -50,7 +49,9 @@ export class RouteDetailDisplayPage {
         this.getPathUUIDArray().within(() => {
             cy.get(this.pathUUIDArrayItem).then(($elements) => {
                 const count = $elements.length
+                
                 expect(count).to.eq(expectedPaths.length)
+                
                 // Loop through each path UUID item
                 cy.wrap($elements).each(($el, index) => {
                     cy.wrap($el).find(this.pathTextClass).then(($textEl) => {
@@ -82,11 +83,11 @@ export class RouteDetailDisplayPage {
     verifyRouteDetails(route) {
         this.verifyNameProperty(route.name)
         this.verifyServicePropertyValue(route.service.name)
-        const routePathsArray = Array.isArray(route.path) ? route.path : [route.path]
-        this.verifyPathUUIDArray(routePathsArray)
-        const methodsArray = Array.isArray(route.method) ? route.method : [route.method]
+        this.verifyPathUUIDArray(route.paths)
+        // Ensure methods is an array
+        const methodsArray = Array.isArray(route.methods) ? route.methods : [route.methods]
         this.verifyMethodArray(methodsArray)
     }
 }
 
-export const routeDetailDisplayPage = new RouteDetailDisplayPage()    
+export const routeDetailDisplayPage = new RouteDetailDisplayPage()
