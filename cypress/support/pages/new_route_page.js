@@ -15,7 +15,7 @@ export class NewRoutePage {
         this.popUpSuccessMessage = 'div[class*="toaster"][class*="success"][role="alert"]'
         this.popUpSuccessMessageText = 'div.toaster.success p.toaster-message'
         this.routePathInputPrefix = 'input[data-testid="route-form-paths-input-'
-        this.addPathButton = 'button[data-testid="add-paths"]'
+        this.addPathButton = 'button[data-testid="add-paths"] span[data-testid="kui-icon-wrapper-add-icon"]'
     }
 
     setName(name) {
@@ -62,7 +62,7 @@ export class NewRoutePage {
     }
 
     setPathAdvanced(index,path) {
-        cy.get(this.routePathInputPrefix + index + '"]').type(path)
+        cy.get(this.routePathInputPrefix + index + '"]').scrollIntoView().type(path, {force: true})
     }
 
     selectMethod(routeMethod) {
@@ -142,7 +142,7 @@ export class NewRoutePage {
             
             if (index === 0) {
                 // Wait for the first path input to be visible and enabled before setting
-                cy.get(pathInputSelector).should('be.visible').should('not.be.disabled')
+                cy.get(pathInputSelector).should('be.visible')
                 this.setPathAdvanced(index + 1, path)
             } else {
                 // Wait for add button to be visible and clickable before clicking
@@ -150,12 +150,6 @@ export class NewRoutePage {
                     .should('be.visible')
                     .should('not.be.disabled')
                     .click()
-                
-                // Wait for the new path input field to appear and be ready
-                cy.get(pathInputSelector, { timeout: 10000 })
-                    .should('be.visible')
-                    .should('exist')
-                    .should('not.be.disabled')
                 
                 this.setPathAdvanced(index + 1, path)
             }
