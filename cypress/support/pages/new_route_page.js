@@ -14,6 +14,8 @@ export class NewRoutePage {
         this.routeSaveButton = 'button[data-testid="route-create-form-submit"]'
         this.popUpSuccessMessage = 'div[class*="toaster"][class*="success"][role="alert"]'
         this.popUpSuccessMessageText = 'div.toaster.success p.toaster-message'
+        this.routePathInputPrefix = 'input[data-testid="route-form-paths-input-'
+        this.addPathButton = 'button[data-testid="add-paths"]'
     }
 
     setName(name) {
@@ -25,7 +27,7 @@ export class NewRoutePage {
             cy.get('[class="select-item-label"]').each((el, index, $list) => {
                 const itemText = el.text().trim()
                 if (itemText == routeService) {
-                    cy.wrap(el).click()
+                    cy.wrap(el).click( {force: true} )
                 }
             })
         })
@@ -47,12 +49,20 @@ export class NewRoutePage {
         cy.get(this.advancedRadioButton).check()
     }
 
+    verifyAdvancedRadioButtonIsChecked() {
+        cy.get(this.advancedRadioButton).should('have.attr', 'aria-checked', 'true')
+    }
+
     selectProtocol(protocol) {
         cy.get(this.protocolSelect).select(protocol)
     }
 
     setPath(path) {
         cy.get(this.routePathInput).type(path)
+    }
+
+    setPathAdvanced(index,path) {
+        cy.get(this.routePathInputPrefix + index + '"]').type(path)
     }
 
     selectMethod(routeMethod) {
@@ -115,6 +125,27 @@ export class NewRoutePage {
         this.verifyStripPathIsUnChecked()
         this.checkStripPathRadioButton()    
         this.verifyStripPathIsChecked()
+        this.clickSaveButton()
+        this.verifyRouteCreatedNotification(routeName)
+    }
+
+    createNewAdvancedRoute(routeName, routeService, tags, routePath, routeMethod) {
+        this.setName(routeName)
+        this.selectService(routeService)
+        this.setTags(tags)
+        this.clickAdvancedRadioButton()
+        this.verifyAdvancedRadioButtonIsChecked()
+        // Handle array of paths - set each path with its index
+        const paths = Array.isArray(routePath) ? routePath : [routePath]
+        cy.wrap(paths).each((path, index) => {
+            if (index === 0) {
+                this.setPathAdvanced(index + 1, path)
+            } else {
+                cy.get(this.addPathButton).click()
+                this.setPathAdvanced(index + 1, path)
+            }
+        })
+        this.selectMethod(routeMethod)
         this.clickSaveButton()
         this.verifyRouteCreatedNotification(routeName)
     }

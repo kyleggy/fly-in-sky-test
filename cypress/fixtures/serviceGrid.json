@@ -73,7 +73,7 @@
             "request_buffering": true,
             "response_buffering": true,
             "methods": ["GET"],
-            "paths": ["/api/v1"],
+            "paths": ["/api/route/v1"],
             "regex_priority": 0,
             "path_handling": "v0"
         }

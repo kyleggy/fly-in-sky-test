@@ -67,7 +67,7 @@ describe('service gateway grid flow', function() {
     })
 
     beforeEach(function() {
-        gatewayServiceMainPage.navigateToGatewayServiceMainPage();
+        gatewayServiceMainPage.navigateToGatewayServiceMainPage()
     })
 
     after(function() {
@@ -92,54 +92,54 @@ describe('service gateway grid flow', function() {
     })
 
     it('filter by fullname should display the correct services', function() {
-        const serviceName = serviceGrids[0].name;
-        gatewayServiceMainPage.clickFilterButton();
-        gatewayServiceMainPage.setFilterByName(serviceName);
-        gatewayServiceMainPage.verifyRowCountInGrid(1);
-        gatewayServiceMainPage.verifyRowNameInGrid(serviceName);
+        const serviceName = serviceGrids[0].name
+        gatewayServiceMainPage.clickFilterButton()
+        gatewayServiceMainPage.setFilterByName(serviceName)
+        gatewayServiceMainPage.verifyRowCountInGrid(1)
+        gatewayServiceMainPage.verifyRowNameInGrid(serviceName)
     })
 
     it('filter by contain name should display the correct services', function() {
-        gatewayServiceMainPage.clickFilterButton();
-        gatewayServiceMainPage.setFilterByName(this.namePrefix);
-        gatewayServiceMainPage.verifyRowCountInGrid(4);
-        gatewayServiceMainPage.verifyRowCountAndNameStartsWithInGrid(this.namePrefix, 4);
+        gatewayServiceMainPage.clickFilterButton()
+        gatewayServiceMainPage.setFilterByName(this.namePrefix)
+        gatewayServiceMainPage.verifyRowCountInGrid(4)
+        gatewayServiceMainPage.verifyRowCountAndNameStartsWithInGrid(this.namePrefix, 4)
     })
 
     it('filter by contain name and protocol should display the correct services', function() {
-        const protocol = 'http';
-        gatewayServiceMainPage.clickFilterButton();
-        gatewayServiceMainPage.setFilterByNameAndProtocol(this.namePrefix, protocol);
-        gatewayServiceMainPage.verifyRowCountInGrid(2);
-        gatewayServiceMainPage.verifyRowCountAndProtocolInGrid(this.namePrefix, protocol, 2);
+        const protocol = 'http'
+        gatewayServiceMainPage.clickFilterButton()
+        gatewayServiceMainPage.setFilterByNameAndProtocol(this.namePrefix, protocol)
+        gatewayServiceMainPage.verifyRowCountInGrid(2)
+        gatewayServiceMainPage.verifyRowCountAndProtocolInGrid(this.namePrefix, protocol, 2)
     })
 
     it('order by name should display the correct order of services', function() {
         const serviceNames = serviceGrids.map(service => service.name)
-        gatewayServiceMainPage.clickFilterButton();
-        gatewayServiceMainPage.setFilterByName(this.namePrefix);
-        gatewayServiceMainPage.orderByByName();
-        gatewayServiceMainPage.verifyRowCountInGrid(4);
-        gatewayServiceMainPage.verifyOrderByByName(serviceNames);
+        gatewayServiceMainPage.clickFilterButton()
+        gatewayServiceMainPage.setFilterByName(this.namePrefix)
+        gatewayServiceMainPage.orderByByName()
+        gatewayServiceMainPage.verifyRowCountInGrid(4)
+        gatewayServiceMainPage.verifyOrderByByName(serviceNames)
     })
 
     it('should disable a service successfully from grid', function() {
-        gatewayServiceMainPage.clickFilterButton();
-        gatewayServiceMainPage.setFilterByName(this.namePrefix);
-        gatewayServiceMainPage.verifyToggleUncheckedAfterDisableService(serviceGrids[1].name);
+        gatewayServiceMainPage.clickFilterButton()
+        gatewayServiceMainPage.setFilterByName(this.namePrefix)
+        gatewayServiceMainPage.verifyToggleUncheckedAfterDisableService(serviceGrids[1].name)
     })
 
     it('should delete a service successfully from grid', function() {
-        gatewayServiceMainPage.clickFilterButton();
-        gatewayServiceMainPage.setFilterByName(this.namePrefix);
-        gatewayServiceMainPage.deleteService(serviceGrids[0].name);
-        gatewayServiceMainPage.verifyRowCountStartsWithInGrid(this.namePrefix, 3);
+        gatewayServiceMainPage.clickFilterButton()
+        gatewayServiceMainPage.setFilterByName(this.namePrefix)
+        gatewayServiceMainPage.deleteService(serviceGrids[0].name)
+        gatewayServiceMainPage.verifyRowCountStartsWithInGrid(this.namePrefix, 3)
     })
 
     it('should not allow to delete a service binding with route from grid', function() {
-        gatewayServiceMainPage.clickFilterButton();
-        gatewayServiceMainPage.setFilterByName(this.namePrefix);
-        gatewayServiceMainPage.verifyServiceBindWithRouteNotAllowedDelete(serviceGrids[3].name);
+        gatewayServiceMainPage.clickFilterButton()
+        gatewayServiceMainPage.setFilterByName(this.namePrefix)
+        gatewayServiceMainPage.verifyServiceBindWithRouteNotAllowedDelete(serviceGrids[3].name)
     })
 
 })

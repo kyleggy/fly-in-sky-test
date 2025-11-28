@@ -7,9 +7,9 @@ export class RouteMainPage {
     }
 
     navigateToRouteMainPage() {
-        cy.fixture('server.json').then((server) => {
+        return cy.fixture('server.json').then((server) => {
             const routeMainPageURL = server.protocol + "://" + server.host + ":" + server.port + "/" + server.workspace + "/routes"
-            cy.visit(routeMainPageURL)
+            return cy.visit(routeMainPageURL)
         })
     }
 

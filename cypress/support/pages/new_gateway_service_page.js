@@ -13,6 +13,7 @@ export class NewGatewayServicePage {
         this.popUpSuccessMessage = 'div[class*="toaster"][class*="success"][role="alert"]'
         this.popUpSuccessMessageText = 'div.toaster.success p.toaster-message'
         this.formErrorMessage = 'div[data-testid="form-error"]'
+        this.cancelSaveButton = 'button[data-testid="service-create-form-cancel"]'
     }
 
     setFullURL(fullURL) {   
@@ -96,6 +97,7 @@ export class NewGatewayServicePage {
     verifyServiceCreationError(serviceName) {
         cy.get(this.formErrorMessage).should('be.visible')
             .and('contain', serviceName).and('contain', 'UNIQUE')
+        cy.get(this.cancelSaveButton).click()
     }
 
     createNewGatewayServiceFromFullURL(fullURL, name) {    

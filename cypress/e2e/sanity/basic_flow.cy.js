@@ -1,5 +1,3 @@
-import { workspacePage } from "../../support/pages/workspace_page"
-import { overviewPage } from "../../support/pages/overview_page"
 import { newGatewayServicePage } from "../../support/pages/new_gateway_service_page"
 import { newRoutePage } from "../../support/pages/new_route_page"
 import { routeDetailDisplayPage } from "../../support/pages/route_detail_page"
@@ -10,28 +8,28 @@ import { routeMainPage } from "../../support/pages/route_main_page"
 describe('basic flow', function() {
     const routeIDs = []
     const serviceIDs = []
+    let sanity = {}
 
     before(function() {
         // Generate a short UUID prefix for this test run
         cy.generateShortUUID().then((namePrefix) => {
             this.namePrefix = namePrefix
-        })
-    })
-
-    beforeEach(function() {
-        cy.fixture('sanity.json').then((sanityData) => {
-            // Create sanity object with prefixed names
-            this.sanity = {
-                service: {
-                    ...sanityData.service,
-                    name: `${this.namePrefix}-${sanityData.service.name}`
-                },
-                route: {
-                    ...sanityData.route,
-                    name: `${this.namePrefix}-${sanityData.route.name}`,
-                    service: `${this.namePrefix}-${sanityData.route.service}`
+            cy.log(`Generated name prefix: ${this.namePrefix}`)
+            
+            cy.fixture('sanity.json').then((sanityData) => {
+                // Create sanity object with prefixed names
+                sanity = {
+                    service: {
+                        ...sanityData.service,
+                        name: `${this.namePrefix}-${sanityData.service.name}`
+                    },
+                    route: {
+                        ...sanityData.route,
+                        name: `${this.namePrefix}-${sanityData.route.name}`,
+                        service: `${this.namePrefix}-${sanityData.route.service}`
+                    }
                 }
-            }
+            })
         })
     })
 
@@ -44,12 +42,9 @@ describe('basic flow', function() {
     })
 
     it('should add a gateway service', function() {
-        //workspacePage.navigateToWorkspace()
-        //workspacePage.clickDefaultWorkspaceLink()
-        //overviewPage.addGatewayService()
         gatewayServiceMainPage.navigateToGatewayServiceMainPage()
         gatewayServiceMainPage.clickCreateNewGatewayService()
-        newGatewayServicePage.createNewGatewayServiceFromFullURL(this.sanity.service.url, this.sanity.service.name)
+        newGatewayServicePage.createNewGatewayServiceFromFullURL(sanity.service.url, sanity.service.name)
         return serviceDetailDisplayPage.getServiceId().then((serviceId) => {
             serviceIDs.push(serviceId)
             cy.log(`Stored service ID: ${serviceId}`)
@@ -57,16 +52,14 @@ describe('basic flow', function() {
     })
 
     it('should add a router', function() {
-        //overviewPage.navigateToOverview()
-        //overviewPage.addRouter()
         routeMainPage.navigateToRouteMainPage()
         routeMainPage.clickCreateNewRoute()
         newRoutePage.createNewBasicRoute(
-            this.sanity.route.name,
-            this.sanity.route.service,
-            this.sanity.route.tags,
-            this.sanity.route.path,
-            this.sanity.route.method
+            sanity.route.name,
+            sanity.route.service,
+            sanity.route.tags,
+            sanity.route.path,
+            sanity.route.method
         )
         return routeDetailDisplayPage.getRouteId().then((routeId) => {
             routeIDs.push(routeId)
@@ -76,7 +69,7 @@ describe('basic flow', function() {
 
     it('should verify the route is working', function() {
         cy.fixture('server.json').then((server) => {
-            const serviceURL = server.protocol + "://" + server.host + ":" + server.serverPort + this.sanity.route.path;
+            const serviceURL = server.protocol + "://" + server.host + ":" + server.serverPort + sanity.route.path;
             cy.log(serviceURL)
             
             const startTime = Date.now()

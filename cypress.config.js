@@ -7,10 +7,6 @@ module.exports = defineConfig({
       require('cypress-mochawesome-reporter/plugin')(on);
     },
     specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
-    excludeSpecPattern: [
-      'cypress/e2e/1-getting-started/**',
-      'cypress/e2e/2-advanced-examples/**'
-    ],
     reporter: 'cypress-mochawesome-reporter',
     reporterOptions: {
       reportDir: 'cypress/reports',
@@ -22,7 +18,9 @@ module.exports = defineConfig({
       reportFilename: 'kong-api-gateway-test-report',
       timestamp: 'yyyy-mm-dd_HH-MM-ss',
       embeddedScreenshots: true,
-      videoOnFailOnly: true
+      videoOnFailOnly: true,
+      showHooks: 'always',
+      saveJson: true  // Saves JSON data file for programmatic access
     }
   },
 });

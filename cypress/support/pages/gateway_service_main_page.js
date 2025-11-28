@@ -116,9 +116,9 @@ export class GatewayServiceMainPage {
     }
 
     navigateToGatewayServiceMainPage() {
-        cy.fixture('server.json').then((server) => {
+        return cy.fixture('server.json').then((server) => {
             const gatewayServiceMainPURL = server.protocol + "://" + server.host + ":" + server.port + "/" + server.workspace + "/services"
-            cy.visit(gatewayServiceMainPURL)
+            return cy.visit(gatewayServiceMainPURL)
         })
     }
 
