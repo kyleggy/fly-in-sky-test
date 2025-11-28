@@ -66,8 +66,10 @@ export class NewRoutePage {
     }
 
     selectMethod(routeMethod) {
-        cy.get(this.routeMethodSelect).click()
-        cy.get(this.selectMethodPrefix + routeMethod + '"]').click()
+        cy.get(this.routeMethodSelect).scrollIntoView().click()
+        cy.wait(1000) // Wait 1 second for the method select to be clicked
+        cy.get(this.selectMethodPrefix + routeMethod + '"]').scrollIntoView().click()
+        cy.wait(1000) // Wait 1 second for the method to be selected
     }
 
     setHost(host) {
