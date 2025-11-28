@@ -59,7 +59,7 @@ describe('Route Flow', function() {
                     method: route.method,
                     url: routeURL,
                     failOnStatusCode: false,
-                    timeout: timeout
+                    timeout: 6000
                 }).then((response) => {
                     if (response.status === 200) {
                         expect(response.status).to.eq(200)
