@@ -55,41 +55,30 @@ describe('Route Flow', function() {
             
             const startTime = Date.now()
             const retryRequest = () => {
-                const elapsedTime = Date.now() - startTime
-                if (elapsedTime >= timeout) {
-                    throw new Error(`Route ${routeIndex + 1} (${route.name}) did not succeed within ${timeout}ms`)
-                }
-                
                 cy.request({
                     method: route.method,
                     url: routeURL,
                     failOnStatusCode: false,
                     timeout: 6000
                 }).then((response) => {
-                    // Check if response exists and has status property
-                    // With failOnStatusCode: false, Cypress should always return a response object
-                    // but check for edge cases
-                    if (!response || (response.status === undefined && response.statusCode === undefined)) {
-                        // Network error or no response - retry if within timeout
-                        if (Date.now() - startTime < timeout) {
-                            cy.log(`Route ${routeIndex + 1} (${route.name}) request failed, retrying...`)
-                            cy.wait(1000, { log: true })
-                            retryRequest()
-                        } else {
-                            throw new Error(`Route ${routeIndex + 1} (${route.name}) failed after ${timeout}ms - no response received`)
-                        }
+                    if (response.status === 200) {
+                        expect(response.status).to.eq(200)
+                        cy.log(`Route ${routeIndex + 1} (${route.name}) is working correctly`)
+                    } else if (Date.now() - startTime < timeout) {
+                        cy.wait(1000, { log: true }) // Wait 1 second before retrying
+                        retryRequest()
                     } else {
-                        const status = response.status || response.statusCode || 0
-                        if (status === 200) {
-                            expect(status).to.eq(200)
-                            cy.log(`Route ${routeIndex + 1} (${route.name}) is working correctly`)
-                        } else if (Date.now() - startTime < timeout) {
-                            cy.log(`Route ${routeIndex + 1} (${route.name}) returned status ${status}, retrying...`)
-                            cy.wait(1000, { log: true }) // Wait 1 second before retrying
-                            retryRequest()
-                        } else {
-                            throw new Error(`Route ${routeIndex + 1} (${route.name}) did not return 200 within ${timeout}ms. Last status: ${status}`)
-                        }
+                        throw new Error(`Route ${routeIndex + 1} (${route.name}) did not return 200 within ${timeout}ms. Last status: ${response.status}`)
+                    }
+                }).catch((error) => {
+                    // Handle network errors, timeouts, or no response
+                    const elapsedTime = Date.now() - startTime
+                    if (elapsedTime < timeout) {
+                        cy.log(`Route ${routeIndex + 1} (${route.name}) request failed, retrying... Error: ${error.message || error}`)
+                        cy.wait(1000, { log: true }) // Wait 1 second before retrying
+                        retryRequest()
+                    } else {
+                        throw new Error(`Route ${routeIndex + 1} (${route.name}) failed after ${timeout}ms. Error: ${error.message || error}`)
                     }
                 })
             }
