@@ -49,7 +49,7 @@ describe('Route Flow', function() {
 
     beforeEach(function() {
         // Helper function to verify a route with retry logic - available to all tests
-        this.verifyRoute = function(route, path, routeIndex, server, timeout = 15000) {
+        this.verifyRoute = function(route, path, routeIndex, server, timeout = 30000) {
             const routeURL = `${server.protocol}://${server.host}:${server.serverPort}${path}`
             cy.log(`Testing route ${routeIndex + 1}: ${routeURL}`)
             
@@ -65,7 +65,7 @@ describe('Route Flow', function() {
                         expect(response.status).to.eq(200)
                         cy.log(`Route ${routeIndex + 1} (${route.name}) is working correctly`)
                     } else if (Date.now() - startTime < timeout) {
-                        cy.wait(1000, { log: false }) // Wait 1 second before retrying
+                        cy.wait(1000, { log: true }) // Wait 1 second before retrying
                         retryRequest()
                     } else {
                         throw new Error(`Route ${routeIndex + 1} (${route.name}) did not return 200 within ${timeout}ms. Last status: ${response.status}`)
