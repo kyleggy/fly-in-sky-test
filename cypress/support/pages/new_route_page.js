@@ -61,8 +61,8 @@ export class NewRoutePage {
         cy.get(this.routePathInput).type(path)
     }
 
-    setPathAdvanced(index,path) {
-        cy.get(this.routePathInputPrefix + index + '"]').scrollIntoView().type(path, {force: true})
+    setPathAdvanced(index, path) {
+        cy.get(this.routePathInputPrefix + index + '"]').scrollIntoView().type(path, {delay: 200})
     }
 
     selectMethod(routeMethod) {
