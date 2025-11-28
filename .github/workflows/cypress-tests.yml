@@ -43,7 +43,9 @@ jobs:
           browser: ${{ matrix.browser }}
           install: false
         env:
+          CI: true
           CYPRESS_BROWSER: ${{ matrix.browser }}
+          CYPRESS_VIDEO: true
 
       - name: Stop Docker services
         if: always()

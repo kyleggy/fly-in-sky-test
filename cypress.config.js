@@ -7,6 +7,9 @@ module.exports = defineConfig({
       require('cypress-mochawesome-reporter/plugin')(on);
     },
     specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
+    // Enable videos for all test runs in CI, fail-only for local runs
+    video: true, // Always record videos
+    videoOnFailOnly: !process.env.CI && process.env.CYPRESS_VIDEO !== 'true', // Only keep videos on failures locally, keep all in CI
     reporter: 'cypress-mochawesome-reporter',
     reporterOptions: {
       reportDir: 'cypress/reports',
@@ -18,7 +21,6 @@ module.exports = defineConfig({
       reportFilename: 'kong-api-gateway-test-report',
       timestamp: 'yyyy-mm-dd_HH-MM-ss',
       embeddedScreenshots: true,
-      videoOnFailOnly: true,
       showHooks: 'always',
       saveJson: true  // Saves JSON data file for programmatic access
     }
