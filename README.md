@@ -375,7 +375,9 @@ Tests use prefixed names to avoid conflicts:
 
 ### Known Issues
 
-1. **CI test skip for path verification**: The test "should verify both paths in one route work correctly" in route_flow.cy.js is skipped when running in GitHub Actions CI. The route configuration is correct (verified by test videos), and the test always passes locally. However, it consistently fails in the CI environment for the second path rest reponse (/test/api/v4) does not return any response. The test is configured to skip automatically in CI while still running locally to maintain test coverage. It needs more investigations for the root cause.
+1. **CI test skip for path verification**: The test "should verify both paths in one route work correctly" in route_flow.cy.js is skipped when running in GitHub Actions CI. The route configuration is correct (verified by test videos and screenshots), and the test always passes locally. However, it consistently fails in the CI environment (Ubuntu) - the second path REST response (`/test/api/v4`) does not return any response. The test is configured to skip automatically in CI while still running locally to maintain test coverage. 
+   
+   📋 **Detailed Issue Documentation:** See [Issue: Route Path Verification Test Fails in CI](./documents/ISSUE-route-path-verification-ci-failure.md) for comprehensive analysis, investigation steps, and proposed solutions.
 
 2. **Dirty data in before hooks**: When manually running Cypress tests, `before` hooks may trigger twice in some cases, potentially creating duplicate test data. This does not affect test results but may leave residual data in the Kong Gateway instance.
 
