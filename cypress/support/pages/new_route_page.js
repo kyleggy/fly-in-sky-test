@@ -67,9 +67,9 @@ export class NewRoutePage {
 
     selectMethod(routeMethod) {
         cy.get(this.routeMethodSelect).scrollIntoView().click()
-        cy.wait(1000) // Wait 1 second for the method select to be clicked
+        //cy.wait(1000) // Wait 1 second for the method select to be clicked
         cy.get(this.selectMethodPrefix + routeMethod + '"]').scrollIntoView().click()
-        cy.wait(1000) // Wait 1 second for the method to be selected
+        //cy.wait(1000) // Wait 1 second for the method to be selected
     }
 
     setHost(host) {
@@ -151,10 +151,10 @@ export class NewRoutePage {
                 cy.get(this.addPathButton)
                     .should('be.visible')
                     .click()
-                cy.wait(1000) // Wait 1 second for the new input field to appear
+                //cy.wait(1000) // Wait 1 second for the new input field to appear
                 cy.get(pathInputSelector).scrollIntoView().should('be.visible')
                 this.setPathAdvanced(index + 1, path)
-                cy.wait(1000) // Wait 1 second for the new input field to be set
+                //cy.wait(1000) // Wait 1 second for the new input field to be set
             }
         })
         this.selectMethod(routeMethod)

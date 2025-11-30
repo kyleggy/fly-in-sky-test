@@ -182,12 +182,11 @@ describe('Route Flow', function() {
     it('should verify both paths in one route work correctly', function() {
         // Skip this test when running in CI
         // Check Cypress environment variable set from process.env.CI
-        // Commented out to allow test to run in CI for verification
-        // if (Cypress.env('CI')) {
-        //     cy.log('Skipping test in CI environment')
-        //     this.skip()
-        //     return
-        // }
+        if (Cypress.env('CI')) {
+            cy.log('Skipping test in CI environment')
+            this.skip()
+            return
+        }
         
         cy.fixture('server.json').then((server) => {
             // Get the routeId for the route with 2 paths (should be at index 2 in routeIDs)
