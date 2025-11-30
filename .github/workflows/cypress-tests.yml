@@ -34,13 +34,19 @@ jobs:
         run: |
           # Install Docker Desktop via Homebrew Cask
           brew install --cask docker
-          # Start Docker Desktop
-          open -a Docker
-          # Wait for Docker to be ready
-          echo "Waiting for Docker to start..."
+          # Wait a moment for installation to complete
+          sleep 5
+          # Start Docker Desktop in the background
+          nohup /Applications/Docker.app/Contents/MacOS/Docker > /tmp/docker.log 2>&1 &
+          DOCKER_PID=$!
+          echo "Started Docker Desktop with PID: $DOCKER_PID"
+          # Wait for Docker daemon to start and be ready
+          echo "Waiting for Docker daemon to start..."
           for i in {1..120}; do
+            # Check if Docker is responding
             if docker info > /dev/null 2>&1; then
               echo "Docker is ready!"
+              docker info
               break
             fi
             echo "Attempt $i/120: Docker not ready yet, waiting..."
