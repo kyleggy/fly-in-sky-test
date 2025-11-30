@@ -189,8 +189,50 @@ describe('Route Flow', function() {
         }
         
         cy.fixture('server.json').then((server) => {
-            this.verifyRoute(route.routes[2], route.routes[2].path[0], 2, server)
-            this.verifyRoute(route.routes[2], route.routes[2].path[1], 2, server)
+            // Get the routeId for the route with 2 paths (should be at index 2 in routeIDs)
+            const routeId = routeIDs[2] // Route with 2 paths is the third route created
+            cy.log(`Verifying Kong Gateway readiness for route ID: ${routeId}`)
+            
+            // Wait for Kong Gateway to be ready - verify route exists via Admin API with retry logic
+            const startTime = Date.now()
+            const timeout = 30000 // 30 seconds timeout
+            const maxAttempts = 10
+            let attemptCount = 0
+            
+            const retryRequest = () => {
+                const elapsedTime = Date.now() - startTime
+                attemptCount++
+                
+                if (elapsedTime >= timeout || attemptCount > maxAttempts) {
+                    cy.log(`Warning: Route readiness check timeout/failed after ${attemptCount} attempts, proceeding anyway`)
+                    return
+                }
+                
+                cy.request({
+                    url: `${server.protocol}://${server.host}:${server.adminPort}/routes/${routeId}`,
+                    failOnStatusCode: false
+                }).then((response) => {
+                    if (response.status === 200) {
+                        cy.log(`Kong Gateway route is ready (attempt ${attemptCount}), proceeding with path verification`)
+                        expect(response.body.paths).to.include(route.routes[2].path[0])
+                        expect(response.body.paths).to.include(route.routes[2].path[1])
+                    } else if (Date.now() - startTime < timeout && attemptCount < maxAttempts) {
+                        cy.log(`Route readiness check attempt ${attemptCount}/${maxAttempts} returned status ${response.status}, retrying...`)
+                        cy.wait(1000, { log: true })
+                        retryRequest()
+                    } else {
+                        cy.log(`Warning: Route readiness check failed after ${attemptCount} attempts (status ${response.status}), proceeding anyway`)
+                    }
+                })
+            }
+            
+            retryRequest()
+            
+            // Proceed with path verification after readiness check
+            cy.then(() => {
+                this.verifyRoute(route.routes[2], route.routes[2].path[0], 2, server)
+                this.verifyRoute(route.routes[2], route.routes[2].path[1], 2, server)
+            })
         })
     })
 
