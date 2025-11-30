@@ -32,9 +32,11 @@ jobs:
 
       - name: Install Colima and Docker
         run: |
+          # Install Docker CLI
+          brew install docker
           # Install Colima via Homebrew (provides Docker Engine with docker compose v2 support)
           brew install colima
-          # Start Colima (this provides Docker and docker compose)
+          # Start Colima (this provides Docker Engine and docker compose)
           colima start
           # Wait for Docker to be ready
           echo "Waiting for Docker to start..."
