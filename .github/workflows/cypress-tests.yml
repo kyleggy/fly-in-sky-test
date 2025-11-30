@@ -30,20 +30,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Docker Desktop
+      - name: Install Colima and Docker
         run: |
-          # Install Docker Desktop via Homebrew Cask
-          brew install --cask docker
-          # Wait a moment for installation to complete
-          sleep 5
-          # Start Docker Desktop in the background
-          nohup /Applications/Docker.app/Contents/MacOS/Docker > /tmp/docker.log 2>&1 &
-          DOCKER_PID=$!
-          echo "Started Docker Desktop with PID: $DOCKER_PID"
-          # Wait for Docker daemon to start and be ready
-          echo "Waiting for Docker daemon to start..."
+          # Install Docker CLI
+          brew install docker
+          # Install Colima
+          brew install colima
+          # Start Colima with VZ driver and increased resources
+          colima start --cpu 2 --memory 4 --disk 20
+          # Wait for Docker to be ready
+          echo "Waiting for Docker to start..."
           for i in {1..120}; do
-            # Check if Docker is responding
             if docker info > /dev/null 2>&1; then
               echo "Docker is ready!"
               docker info
@@ -87,6 +84,11 @@ jobs:
         run: |
           cd docker
           docker compose down
+
+      - name: Stop Colima
+        if: always()
+        run: |
+          colima stop
 
       - name: Upload test reports
         if: always()
