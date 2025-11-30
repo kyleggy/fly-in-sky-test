@@ -30,22 +30,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Colima and Docker
+      - name: Install Docker Desktop
         run: |
-          # Install Docker CLI
-          brew install docker
-          # Install Colima via Homebrew (provides Docker Engine with docker compose v2 support)
-          brew install colima
-          # Start Colima (this provides Docker Engine and docker compose)
-          colima start
+          # Install Docker Desktop via Homebrew Cask
+          brew install --cask docker
+          # Start Docker Desktop
+          open -a Docker
           # Wait for Docker to be ready
           echo "Waiting for Docker to start..."
-          for i in {1..60}; do
+          for i in {1..120}; do
             if docker info > /dev/null 2>&1; then
               echo "Docker is ready!"
               break
             fi
-            echo "Attempt $i/60: Docker not ready yet, waiting..."
+            echo "Attempt $i/120: Docker not ready yet, waiting..."
             sleep 2
           done
 
@@ -83,11 +81,6 @@ jobs:
         run: |
           cd docker
           docker compose down
-
-      - name: Stop Colima
-        if: always()
-        run: |
-          colima stop
 
       - name: Upload test reports
         if: always()
