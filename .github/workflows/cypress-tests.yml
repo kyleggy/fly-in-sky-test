@@ -34,10 +34,10 @@ jobs:
         run: |
           # Install Docker CLI
           brew install docker
-          # Install Colima
-          brew install colima
-          # Start Colima with VZ driver and increased resources
-          colima start --cpu 2 --memory 4 --disk 20
+          # Install Colima and QEMU (QEMU driver is more reliable in CI)
+          brew install colima qemu
+          # Start Colima with QEMU driver and increased resources
+          colima start --vm-type=qemu --cpu 2 --memory 4 --disk 20
           # Wait for Docker to be ready
           echo "Waiting for Docker to start..."
           for i in {1..120}; do
