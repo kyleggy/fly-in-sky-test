@@ -14,14 +14,16 @@ export class RouteMainPage {
     }
 
     clickCreateNewRoute() {
-        //While there is no route, the empty state button will be shown. we have to wait for 2 seconds 
-        // since jquery $mainContent.find does not wait for the element to be found.
-        cy.get('div[class="main-content"]').wait(2000).then(($mainContent) => {
-            if ($mainContent.find(this.emptyRouteState).length > 0) {
-                cy.get(this.createNewEmptyRouteButton).click()
-            } else {
-                cy.get(this.createNewRouteFromToolbarButton).click()
-            }
+        cy.get('div[class="main-content"]').within(() => {
+            cy.getRoutes().then((response) => {
+                if (response.body.data && response.body.data.length === 0) {
+                    // No routes exist, click the empty state button
+                    cy.get(this.createNewEmptyRouteButton).click()
+                } else {
+                    // Routes exist, click the toolbar button
+                    cy.get(this.createNewRouteFromToolbarButton).click()
+                }
+            })
         })
     }
 }

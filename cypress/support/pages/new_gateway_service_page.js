@@ -22,7 +22,7 @@ export class NewGatewayServicePage {
 
     setName(name) {
         cy.get(this.nameInput).clear({force: true});
-        cy.get(this.nameInput).type(name, {delay: 200})
+        cy.get(this.nameInput).type(name)
     }
 
     selectFullURLRadioButton() {
@@ -57,11 +57,11 @@ export class NewGatewayServicePage {
     }
 
     setHost(host) {
-        cy.get(this.hostInput).type(host, {delay: 100})
+        cy.get(this.hostInput).type(host)
     }
 
     setPath(path) {
-        cy.get(this.pathInput).type(path, {delay: 100})
+        cy.get(this.pathInput).type(path)
     }
 
     setPort(port) {

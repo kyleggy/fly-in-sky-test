@@ -35,6 +35,31 @@ Cypress.Commands.add('createRoute', (routeData) => {
 })
 
 /**
+ * Get all routes via GET request
+ * @returns {Cypress.Chainable} The response object containing routes
+ * @example cy.getRoutes().then((response) => { ... })
+ */
+Cypress.Commands.add('getRoutes', () => {
+    cy.log('Getting all routes')
+    return cy.fixture('server.json').then((server) => {
+        const routesAPIURL = `${server.protocol}://${server.host}:${server.adminPort}/${server.workspace}/routes`
+        return cy.request({
+            method: 'GET',
+            url: routesAPIURL,
+            failOnStatusCode: false
+        }).then((response) => {
+            if (response.status === 200) {
+                cy.log(`Successfully retrieved ${response.body.data?.length || 0} route(s)`)
+            } else {
+                cy.log(`Unexpected status ${response.status} when getting routes`)
+            }
+            // Return the response wrapped in a chainable object
+            return cy.wrap(response)
+        })
+    })
+})
+
+/**
  * Delete a single route by ID
  * @param {string} routeId - The route ID to delete
  * @returns {Cypress.Chainable} The response object with success status
@@ -61,6 +86,8 @@ Cypress.Commands.add('deleteRoute', (routeId) => {
         })
     })
 })
+
+
 
 /**
  * Delete a route first, then delete the associated service if route deletion succeeds
@@ -156,6 +183,33 @@ Cypress.Commands.add('deleteService', (serviceId) => {
         })
     })
 })
+
+/**
+ * Get all services via GET request
+ * @returns {Cypress.Chainable} The response object containing services
+ * @example cy.getServices().then((response) => { ... })
+ */
+Cypress.Commands.add('getServices', () => {
+    cy.log('Getting all services')
+    return cy.fixture('server.json').then((server) => {
+        const servicesAPIURL = `${server.protocol}://${server.host}:${server.adminPort}/${server.workspace}/services`
+        return cy.request({
+            method: 'GET',
+            url: servicesAPIURL,
+            failOnStatusCode: false
+        }).then((response) => {
+            if (response.status === 200) {
+                cy.log(`Successfully retrieved ${response.body.data?.length || 0} service(s)`)
+            } else {
+                cy.log(`Unexpected status ${response.status} when getting services`)
+            }
+            // Return the response wrapped in a chainable object
+            return cy.wrap(response)
+        })
+    })
+})
+
+
 
 /**
  * Clean up multiple routes
