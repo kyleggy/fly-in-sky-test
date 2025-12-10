@@ -5,12 +5,12 @@ export class GatewayServiceMainPage {
         this.createNewGatewayServiceFromToolbarButton = 'a[data-testid="toolbar-add-gateway-service"][type="button"]'
         this.filterButton = 'button[data-testid="filter-button"]'
         this.filterName = 'div[data-testid="name"]'
-        this.filterNameInput = 'div[data-testid="name"] input[id="filter-name"]'
-        this.applyNameButton = 'div[data-testid="name"] button[data-testid="apply-filter"]'
+        this.filterNameInput = 'input[id="filter-name"]'
+        this.applyNameButton = 'button[data-testid="apply-filter"]'
         this.filterProtocol = 'div[data-testid="protocol"]'
-        this.filterProtocolDropdown = 'div[data-testid="protocol"] input[data-testid="select-input"]'
-        this.filterProtocolDropdownPrefix = 'div[data-testid="protocol"] div[data-testid="select-item-'
-        this.filterProtocolApplyButton = 'div[data-testid="protocol"] button[data-testid="apply-filter"]'
+        this.filterProtocolDropdown = 'input[data-testid="select-input"]'
+        this.filterProtocolDropdownPrefix = 'div[data-testid="select-item-'
+        this.filterProtocolApplyButton = 'button[data-testid="apply-filter"]'
         this.deleteMenuButton = 'button[data-testid="action-entity-delete"]'
         this.enabledSwitch = 'span[data-testid="switch-control"]'
         this.deleteConfirmationInput = 'input[data-testid="confirmation-input"]'
@@ -20,7 +20,8 @@ export class GatewayServiceMainPage {
         this.emptyServiceState = 'div[data-testid="table-empty-state"]'
         this.nameCell = 'td[data-testid="name"]'
         this.protocolCell = 'td[data-testid="protocol"]'
-        this.alertMessageForDeleteServiceBindWithRoute = 'div[class="prompt-content"] div[class="alert-message"]'
+        this.alertMessagePromptContent = 'div[class="prompt-content"]'
+        this.alertMessageForDeleteServiceBindWithRoute = 'div[class="alert-message"]'
         this.disableServicePopupButton = 'button[data-testid="modal-action-button"]'
     }
 
@@ -80,7 +81,9 @@ export class GatewayServiceMainPage {
         this._clickDeleteMenuButton(serviceName)
         this._typeDeleteConfirmation(serviceName)
         this._clickDeleteConfirmationApplyButton()
-        cy.get(this.alertMessageForDeleteServiceBindWithRoute).should('have.text', 'an existing \'routes\' entity references this \'services\' entity')
+        cy.get(this.alertMessagePromptContent).within(() => {
+            cy.get(this.alertMessageForDeleteServiceBindWithRoute).should('have.text', 'an existing \'routes\' entity references this \'services\' entity')
+        })
     }
 
     orderByByName() {   
@@ -123,30 +126,35 @@ export class GatewayServiceMainPage {
     }
 
     clickCreateNewGatewayService() {
-        //While there is no service, the empty state button will be shown. we have to wait for 2 seconds 
-        // since jquery $mainContent.find does not wait for the element to be found.
-        cy.get('div[class="main-content"]').wait(2000).then(($mainContent) => {
-            if ($mainContent.find(this.emptyServiceState).length > 0) {
-                cy.get(this.createNewEmptyGatewayServiceButton).click()
-            } else {
-                cy.get(this.createNewGatewayServiceFromToolbarButton).click()
-            }
+        cy.get('div[class="main-content"]').within(() => {
+            cy.getServices().then((response) => {
+                if (response.body.data && response.body.data.length === 0) {
+                    // No services exist, click the empty state button
+                    cy.get(this.createNewEmptyGatewayServiceButton).click()
+                } else {
+                    // Services exist, click the toolbar button
+                    cy.get(this.createNewGatewayServiceFromToolbarButton).click()
+                }
+            })
         })
     }
 
     setFilterByNameAndProtocol(name, protocol) {
-        cy.get(this.filterName).click()
-        cy.get(this.filterNameInput).type(name)
-        cy.get(this.filterProtocol).click()
-        cy.get(this.filterProtocolDropdown).click()
-        cy.get(this.filterProtocolDropdownPrefix + protocol + '"]').click()
-        cy.get(this.filterProtocolApplyButton).click()
+        cy.get(this.filterName).click().within(()=> {
+            cy.get(this.filterNameInput).type(name)
+        })
+        cy.get(this.filterProtocol).click().within(() => {
+            cy.get(this.filterProtocolDropdown).click()
+            cy.get(this.filterProtocolDropdownPrefix + protocol + '"]').click()
+            cy.get(this.filterProtocolApplyButton).click()
+        })
     }
 
     setFilterByName(name) { 
-        cy.get(this.filterName).click()
-        cy.get(this.filterNameInput).type(name)
-        cy.get(this.applyNameButton).click()
+        cy.get(this.filterName).click().within(() => {
+            cy.get(this.filterNameInput).type(name)
+            cy.get(this.applyNameButton).click()
+        })
     }
 
     clickFilterButton() {

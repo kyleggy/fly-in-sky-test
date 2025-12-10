@@ -15,7 +15,8 @@ export class NewRoutePage {
         this.popUpSuccessMessage = 'div[class*="toaster"][class*="success"][role="alert"]'
         this.popUpSuccessMessageText = 'div.toaster.success p.toaster-message'
         this.routePathInputPrefix = 'input[data-testid="route-form-paths-input-'
-        this.addPathButton = 'button[data-testid="add-paths"] span[data-testid="kui-icon-wrapper-add-icon"]'
+        this.addPathButton = 'button[data-testid="add-paths"]'
+        this.addPathIcon = 'span[data-testid="kui-icon-wrapper-add-icon"]'
     }
 
     setName(name) {
@@ -148,9 +149,9 @@ export class NewRoutePage {
                 this.setPathAdvanced(index + 1, path)
             } else {
                 // Wait for add button to be visible and clickable before clicking
-                cy.get(this.addPathButton)
-                    .should('be.visible')
-                    .click()
+                cy.get(this.addPathButton).within(() => {
+                    cy.get(this.addPathIcon).should('be.visible').click()
+                })
                 //cy.wait(1000) // Wait 1 second for the new input field to appear
                 cy.get(pathInputSelector).scrollIntoView().should('be.visible')
                 this.setPathAdvanced(index + 1, path)
